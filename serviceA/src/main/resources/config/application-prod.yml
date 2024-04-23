@@ -67,11 +67,11 @@ spring:
 keycloak:
   response_type: code
   client_id: daotao
-  client_secret: qfLnVjYYRLf1yoam9gZ8sXamClZtoxn7
+  client_secret: 52QACD8IjOLkJKQvqjqKTYYpn7Rrz3pJ
   redirect_uri: http://localhost:9000/login/oauth2/code/oidc
   authorization_endpoint: /realms/graduation_project/protocol/openid-connect/auth
   authorization_host: http://localhost:8090
-  scope: openid, email
+  scope: openid
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:

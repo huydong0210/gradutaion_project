@@ -1,10 +1,13 @@
 package com.huydong.uet.service.dto;
 
+import java.util.List;
+
 public class UserInfo {
 
     private String email;
     private String name;
     private String username;
+    private List<String> roles;
 
     public String getEmail() {
         return email;
@@ -28,5 +31,13 @@ public class UserInfo {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

@@ -1,5 +1,7 @@
 package com.huydong.daotao.security.jwt;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huydong.daotao.service.dto.UserInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -28,6 +31,9 @@ import tech.jhipster.config.JHipsterProperties;
 
 @Component
 public class TokenProvider {
+
+    @Value("${keycloak.client_secret}")
+    private String clientSecret;
 
     private final Logger log = LoggerFactory.getLogger(TokenProvider.class);
 
@@ -97,7 +103,10 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(UserInfo userInfo, String token) {
-        Collection<? extends GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("user"));
+
+        Collection<? extends GrantedAuthority> authorities;
+
+        authorities= userInfo.getRoles().stream().map(m -> new SimpleGrantedAuthority(m)).collect(Collectors.toList());
         //        Claims claims = jwtParser.parseClaimsJws(token).getBody();
 
         //        Collection<? extends GrantedAuthority> authorities = Arrays
@@ -126,21 +135,28 @@ public class TokenProvider {
         RestTemplate restTemplate = new RestTemplate();
         setTimeOut(restTemplate);
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        HttpEntity<Object> entity = new HttpEntity<Object>(null, headers);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", "daotao");
+        formData.add("client_secret", clientSecret);
+        formData.add("token", accessToken);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/userinfo",
-                HttpMethod.GET,
+                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/token/introspect",
+                HttpMethod.POST,
                 entity,
                 String.class
             );
             if (response.hasBody()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                TypeReference<List<String>> roles = new TypeReference<List<String>>() {};
                 JSONObject jsonObject = new JSONObject(response.getBody());
                 UserInfo result = new UserInfo();
                 result.setEmail(jsonObject.get("email").toString());
                 result.setName(jsonObject.get("name").toString());
                 result.setUsername(jsonObject.get("preferred_username").toString());
+                String scope = jsonObject.getString("scope");
+                result.setRoles(Arrays.asList(scope.split(" ")));
                 return Optional.ofNullable(result);
             }
         } catch (Exception e) {

@@ -12,7 +12,7 @@ import { Account } from 'app/core/auth/account.model';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  account: Account | null = null;
+  account: any | null = null;
 
   private readonly destroy$ = new Subject<void>();
 

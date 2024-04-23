@@ -3,10 +3,12 @@ package com.huydong.daotao.web.rest;
 import com.huydong.daotao.domain.User;
 import com.huydong.daotao.repository.UserRepository;
 import com.huydong.daotao.security.SecurityUtils;
+import com.huydong.daotao.service.AuthService;
 import com.huydong.daotao.service.MailService;
 import com.huydong.daotao.service.UserService;
 import com.huydong.daotao.service.dto.AdminUserDTO;
 import com.huydong.daotao.service.dto.PasswordChangeDTO;
+import com.huydong.daotao.service.dto.UserInfo;
 import com.huydong.daotao.web.rest.errors.*;
 import com.huydong.daotao.web.rest.vm.KeyAndPasswordVM;
 import com.huydong.daotao.web.rest.vm.ManagedUserVM;
@@ -17,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,11 +43,13 @@ public class AccountResource {
     private final UserService userService;
 
     private final MailService mailService;
+    private final AuthService authService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, AuthService authService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.authService = authService;
     }
 
     /**
@@ -97,12 +102,16 @@ public class AccountResource {
      * @return the current user.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
+//    @GetMapping("/account")
+//    public AdminUserDTO getAccount() {
+//        return userService
+//            .getUserWithAuthorities()
+//            .map(AdminUserDTO::new)
+//            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+//    }
     @GetMapping("/account")
-    public AdminUserDTO getAccount() {
-        return userService
-            .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+    public UserInfo getAccount() {
+        return authService.getUserInfo(SecurityUtils.getCurrentUserJWT().get()).get();
     }
 
     /**

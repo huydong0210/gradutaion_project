@@ -3,10 +3,12 @@ package com.huydong.uet.web.rest;
 import com.huydong.uet.domain.User;
 import com.huydong.uet.repository.UserRepository;
 import com.huydong.uet.security.SecurityUtils;
+import com.huydong.uet.service.AuthService;
 import com.huydong.uet.service.MailService;
 import com.huydong.uet.service.UserService;
 import com.huydong.uet.service.dto.AdminUserDTO;
 import com.huydong.uet.service.dto.PasswordChangeDTO;
+import com.huydong.uet.service.dto.UserInfo;
 import com.huydong.uet.web.rest.errors.*;
 import com.huydong.uet.web.rest.vm.KeyAndPasswordVM;
 import com.huydong.uet.web.rest.vm.ManagedUserVM;
@@ -40,11 +42,13 @@ public class AccountResource {
     private final UserService userService;
 
     private final MailService mailService;
+    private final AuthService authService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, AuthService authService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.authService = authService;
     }
 
     /**
@@ -98,11 +102,8 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public AdminUserDTO getAccount() {
-        return userService
-            .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+    public UserInfo getAccount() {
+        return authService.getUserInfo(SecurityUtils.getCurrentUserJWT().get()).get();
     }
 
     /**

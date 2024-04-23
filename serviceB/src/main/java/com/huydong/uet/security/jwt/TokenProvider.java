@@ -1,5 +1,7 @@
 package com.huydong.uet.security.jwt;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huydong.uet.service.dto.UserInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -10,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +25,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 import tech.jhipster.config.JHipsterProperties;
@@ -66,21 +71,28 @@ public class TokenProvider {
         RestTemplate restTemplate = new RestTemplate();
         setTimeOut(restTemplate);
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        HttpEntity<Object> entity = new HttpEntity<Object>(null, headers);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", "uet");
+        formData.add("client_secret", "c7mN9efQ6ULDdtGzZ985uMHKGL9Hivax");
+        formData.add("token", accessToken);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/userinfo",
-                HttpMethod.GET,
+                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/token/introspect",
+                HttpMethod.POST,
                 entity,
                 String.class
             );
             if (response.hasBody()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                TypeReference<List<String>> roles = new TypeReference<List<String>>() {};
                 JSONObject jsonObject = new JSONObject(response.getBody());
                 UserInfo result = new UserInfo();
                 result.setEmail(jsonObject.get("email").toString());
-                result.setName(jsonObject.get("name").toString());
-                result.setUsername(jsonObject.get("preferred_username").toString());
+//                result.setName(jsonObject.get("name").toString());
+                result.setUsername(jsonObject.get("username").toString());
+                String scope = jsonObject.getString("scope");
+                result.setRoles(Arrays.asList(scope.split(" ")));
                 return Optional.ofNullable(result);
             }
         } catch (Exception e) {

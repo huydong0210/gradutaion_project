@@ -1,10 +1,17 @@
 package com.huydong.daotao.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huydong.daotao.security.KeycloakProperties;
 import com.huydong.daotao.service.AuthService;
 import com.huydong.daotao.service.dto.JWTToken;
 import com.huydong.daotao.service.dto.UserInfo;
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+
+import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -62,20 +69,28 @@ public class AuthServiceImpl implements AuthService {
         RestTemplate restTemplate = new RestTemplate();
         setTimeOut(restTemplate);
         HttpHeaders headers = new HttpHeaders();
-        HttpEntity<Object> entity = new HttpEntity<Object>(null, headers);
-        headers.setBearerAuth(accessToken);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("client_id", "daotao");
+        formData.add("client_secret", keycloakProperties.getClientSecret());
+        formData.add("token", accessToken);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
         try {
-            ResponseEntity<JSONObject> response = restTemplate.exchange(
-                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/userinfo",
-                HttpMethod.GET,
+            ResponseEntity<String> response = restTemplate.exchange(
+                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/token/introspect",
+                HttpMethod.POST,
                 entity,
-                JSONObject.class
+                String.class
             );
             if (response.hasBody()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                TypeReference<List<String>> roles = new TypeReference<List<String>>() {};
+                JSONObject jsonObject = new JSONObject(response.getBody());
                 UserInfo result = new UserInfo();
-                result.setEmail(response.getBody().get("email").toString());
-                result.setName(response.getBody().get("name").toString());
-                result.setUsername(response.getBody().get("preferred_username").toString());
+                result.setEmail(jsonObject.get("email").toString());
+                result.setName(jsonObject.get("name").toString());
+                result.setUsername(jsonObject.get("preferred_username").toString());
+                String scope = jsonObject.getString("scope");
+                result.setRoles(Arrays.asList(scope.split(" ")));
                 return Optional.ofNullable(result);
             }
         } catch (Exception e) {

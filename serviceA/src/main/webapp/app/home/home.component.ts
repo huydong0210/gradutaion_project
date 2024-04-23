@@ -6,6 +6,7 @@ import { sequenceEqual, takeUntil } from 'rxjs/operators';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { LoginService } from '../login/login.service';
+import * as dayjs from "dayjs";
 
 @Component({
   selector: 'jhi-home',
@@ -13,7 +14,7 @@ import { LoginService } from '../login/login.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  account: Account | null = null;
+  account: any | null = null;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -23,7 +24,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(account => (this.account = account));
+      .subscribe(account => (this.account = account
+      ), error =>{
+        localStorage.removeItem("authenticationToken")
+        localStorage.removeItem("refresh_token")
+        localStorage.removeItem("id_token")
+      });
   }
 
   login(): void {
