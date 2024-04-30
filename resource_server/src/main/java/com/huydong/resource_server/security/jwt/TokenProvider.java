@@ -1,5 +1,7 @@
 package com.huydong.resource_server.security.jwt;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -7,15 +9,29 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import liquibase.pro.packaged.J;
+import netscape.javascript.JSObject;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.client.RestTemplate;
 import tech.jhipster.config.JHipsterProperties;
 
 @Component
@@ -75,27 +91,73 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = jwtParser.parseClaimsJws(token).getBody();
 
-        Collection<? extends GrantedAuthority> authorities = Arrays
-            .stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-            .filter(auth -> !auth.trim().isEmpty())
-            .map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        String[] split_string = token.split("\\.");
+        String base64EncodedHeader = split_string[0];
+        String base64EncodedBody = split_string[1];
+        String base64EncodedSignature = split_string[2];
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+
+        org.apache.commons.codec.binary.Base64 base64Url = new Base64(true);
+        String header = new String(base64Url.decode(base64EncodedHeader));
+
+        String body = new String(base64Url.decode(base64EncodedBody));
+        JSONObject jsObject;
+        try {
+            jsObject = new JSONObject(body);
+            Collection<? extends GrantedAuthority> authorities = Arrays
+                .stream(jsObject.get("scope").toString().split(" "))
+                .filter(auth -> !auth.trim().isEmpty())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
+            User principal = new User(jsObject.get("preferred_username").toString(), "", authorities);
+
+            return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public boolean validateToken(String authToken) {
+//    public boolean validateToken(String authToken) {
+//        try {
+//            jwtParser.parseClaimsJws(authToken);
+//            return true;
+//        } catch (JwtException | IllegalArgumentException e) {
+//            log.info("Invalid JWT token.");
+//            log.trace("Invalid JWT token trace.", e);
+//        }
+//        return false;
+//    }
+    public boolean validateToken(String jwt){
+        RestTemplate restTemplate = new RestTemplate();
+        setTimeOut(restTemplate);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwt);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(null, headers);
         try {
-            jwtParser.parseClaimsJws(authToken);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.info("Invalid JWT token.");
-            log.trace("Invalid JWT token trace.", e);
+            ResponseEntity<String> response = restTemplate.exchange(
+                "http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/userinfo",
+                HttpMethod.GET,
+                entity,
+                String.class
+            );
+            if (response.hasBody()) {
+                return true;
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
         }
         return false;
+    }
+    private static void setTimeOut(RestTemplate restTemplate) {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        int time = 120000;
+        requestFactory.setReadTimeout(time);
+        requestFactory.setConnectTimeout(time);
+        restTemplate.setRequestFactory(requestFactory);
     }
 }

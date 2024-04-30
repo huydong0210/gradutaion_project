@@ -73,6 +73,14 @@ keycloak:
   authorization_host: http://localhost:8090
   scope: openid
 
+zuul:
+  routes:
+    resource-server:
+      sensitive-headers:
+        - header
+      path: /api/resource-server/**
+      url: http://localhost:8083/api/
+
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
 # keytool -genkey -alias servicea -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650

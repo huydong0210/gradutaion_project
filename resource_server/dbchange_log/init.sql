@@ -1,10 +1,10 @@
-create table parents
+create table relation
 (
     id                 bigint auto_increment
         primary key,
     name nvarchar(50),
     phone_number varchar(20),
-    age int,
+    year_of_birth int,
     relation varchar(50),
     user_id long
 );
