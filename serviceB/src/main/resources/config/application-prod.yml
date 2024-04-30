@@ -27,10 +27,10 @@ management:
 
 keycloak:
   response_type: code
-  client_id: uet
-  client_secret: c7mN9efQ6ULDdtGzZ985uMHKGL9Hivax
+  client_id: serviceB
+  client_secret: v9XafaEPhOGL8Ws4rJCCXrdR1bpSOiyi
   redirect_uri: http://localhost:9001/login/oauth2/code/oidc
-  authorization_endpoint: /realms/graduation_project/protocol/openid-connect/auth
+  authorization_endpoint: /realms/UET_Authorization_server/protocol/openid-connect/auth
   authorization_host: http://localhost:8090
   scope: openid
 

@@ -32,8 +32,26 @@ import tech.jhipster.config.JHipsterProperties;
 @Component
 public class TokenProvider {
 
+    @Value("${keycloak.response_type}")
+    private String responseType;
+
+    @Value("${keycloak.client_id}")
+    private String clientId;
+
     @Value("${keycloak.client_secret}")
     private String clientSecret;
+
+    @Value("${keycloak.redirect_uri}")
+    private String redirectUri;
+
+    @Value("${keycloak.authorization_endpoint}")
+    private String authorizationEndpoint;
+
+    @Value("${keycloak.authorization_host}")
+    private String authorizationHost;
+
+    @Value("${keycloak.scope}")
+    private List<String> scope;
 
     private final Logger log = LoggerFactory.getLogger(TokenProvider.class);
 
@@ -136,13 +154,13 @@ public class TokenProvider {
         setTimeOut(restTemplate);
         HttpHeaders headers = new HttpHeaders();
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", "daotao");
+        formData.add("client_id",clientId);
         formData.add("client_secret", clientSecret);
         formData.add("token", accessToken);
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/token/introspect",
+                "http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/token/introspect",
                 HttpMethod.POST,
                 entity,
                 String.class

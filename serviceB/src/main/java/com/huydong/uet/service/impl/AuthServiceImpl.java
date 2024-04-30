@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/token",
+                "http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/token",
                 HttpMethod.POST,
                 request,
                 String.class
@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8090/realms/graduation_project/protocol/openid-connect/token/introspect",
+                "http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/token/introspect",
                 HttpMethod.POST,
                 entity,
                 String.class
@@ -103,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
     public String getLogOutUri(String idToken) {
         StringBuilder result = new StringBuilder();
         result
-            .append("http://localhost:8090/realms/graduation_project/protocol/openid-connect/logout?")
+            .append("http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/logout?")
             .append("id_token_hint=")
             .append(idToken)
             .append("&")
