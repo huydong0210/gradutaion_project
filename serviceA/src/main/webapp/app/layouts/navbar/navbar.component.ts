@@ -56,7 +56,7 @@ export class NavbarComponent implements OnInit {
     localStorage.removeItem('id_token');
     localStorage.removeItem('authenticationToken');
     window.location.href =
-      'http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/logout' +
+      'http://localhost:8090/realms/UET_Authorization_Server/protocol/openid-connect/logout' +
       '?id_token_hint=' +
       id_token +
       '&post_logout_redirect_uri=' +

@@ -28,11 +28,11 @@ management:
 keycloak:
   response_type: code
   client_id: serviceB
-  client_secret: v9XafaEPhOGL8Ws4rJCCXrdR1bpSOiyi
+  client_secret: o1KKU8m1MckPsmKiEbiFQvomB4E3WcFD
   redirect_uri: http://localhost:9001/login/oauth2/code/oidc
-  authorization_endpoint: /realms/UET_Authorization_server/protocol/openid-connect/auth
+  authorization_endpoint: /realms/UET_Authorization_Server/protocol/openid-connect/auth
   authorization_host: http://localhost:8090
-  scope: openid, subject
+  scope: openid
 zuul:
   routes:
     resource-server:

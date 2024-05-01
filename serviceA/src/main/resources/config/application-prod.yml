@@ -67,9 +67,9 @@ spring:
 keycloak:
   response_type: code
   client_id: serviceA
-  client_secret: GfjJvrG1ZTl3GkXcI5E6IM9osXGFf3qW
+  client_secret: TuclLYT1pbKWI0EfLATTjfZ1yvefwN0h
   redirect_uri: http://localhost:9000/login/oauth2/code/oidc
-  authorization_endpoint: /realms/UET_Authorization_server/protocol/openid-connect/auth
+  authorization_endpoint: /realms/UET_Authorization_Server/protocol/openid-connect/auth
   authorization_host: http://localhost:8090
   scope: openid
 

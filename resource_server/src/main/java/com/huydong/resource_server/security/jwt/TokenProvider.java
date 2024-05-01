@@ -138,7 +138,7 @@ public class TokenProvider {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(null, headers);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8090/realms/UET_Authorization_server/protocol/openid-connect/userinfo",
+                "http://localhost:8090/realms/UET_Authorization_Server/protocol/openid-connect/userinfo",
                 HttpMethod.GET,
                 entity,
                 String.class
