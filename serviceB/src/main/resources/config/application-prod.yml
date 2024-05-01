@@ -32,7 +32,7 @@ keycloak:
   redirect_uri: http://localhost:9001/login/oauth2/code/oidc
   authorization_endpoint: /realms/UET_Authorization_server/protocol/openid-connect/auth
   authorization_host: http://localhost:8090
-  scope: openid
+  scope: openid, subject
 zuul:
   routes:
     resource-server:

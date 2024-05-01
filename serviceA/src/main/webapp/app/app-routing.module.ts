@@ -28,10 +28,10 @@ const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
           path: 'account',
           loadChildren: () => import('./account/account.module').then(m => m.AccountModule),
         },
-        {
-          path: 'login',
-          loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
-        },
+        // {
+        //   path: 'login',
+        //   loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
+        // },
         // {
         //   path: '/login/oauth2/code/oidc',
         //   component: HomeComponent,

@@ -17,7 +17,7 @@ export class NavbarComponent implements OnInit {
   isNavbarCollapsed = true;
   openAPIEnabled?: boolean;
   version = '';
-  account: Account | null = null;
+  account: any | null = null;
 
   constructor(
     private loginService: LoginService,

@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import {StudentInfoService} from "./student-info.service";
 
 @Component({
   selector: 'jhi-home',
@@ -13,10 +14,22 @@ import { Account } from 'app/core/auth/account.model';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   account: any | null = null;
+  selection : any;
+  studentInfo : any;
+  address : any | null;
+  subjects: any[] | null;
+  relations : any[] | null;
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private accountService: AccountService, private router: Router) {}
+  constructor(private accountService: AccountService,
+              private studentInfoService : StudentInfoService,
+              private router: Router) {
+    this.selection = 0;
+    this.address= null;
+    this.subjects = null;
+    this.relations = null;
+  }
 
   ngOnInit(): void {
     this.accountService
@@ -37,6 +50,35 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (sessionStorage.getItem('is_reload')) {
       sessionStorage.removeItem('is_reload');
       window.location.reload();
+    }
+  }
+  selectType(type : number): void{
+    this.selection = type;
+    switch (this.selection){
+      case 1: {
+        this.studentInfoService.getAddress().subscribe(res=> {
+          this.address =res;
+        },error => {
+          this.address = null;
+        });
+        break;
+      }
+      case 2: {
+        this.studentInfoService.getSubjects().subscribe(res =>{
+          this.subjects = res;
+        }, error => {
+          this.subjects = null;
+        })
+        break;
+      }
+      case 3: {
+        this.studentInfoService.getRelation().subscribe(res => {
+          this.relations = res;
+        }, error => {
+          this.relations = null;
+        })
+        break;
+      }
     }
   }
 }

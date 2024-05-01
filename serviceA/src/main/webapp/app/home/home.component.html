@@ -4,23 +4,94 @@
   </div>
 
   <div class="col-md-9">
-    <h1 class="display-4"><span>Welcome </span> (Service A)</h1>
+    <h1 class="display-4"><span>Chào mừng bạn đến với  </span></h1>
 
     <div [ngSwitch]="account !== null">
       <div class="alert alert-success" *ngSwitchCase="true">
-        <span id="home-logged-message" *ngIf="account">You are logged in as user "{{ account.username }}" and roles : {{ account.roles }}.</span>
+        <span id="home-logged-message" *ngIf="account">Bạn đã đăng nhập với mã sinh viên "{{ account.username }}
+          ".</span>
+      </div>
+      <div class="alert alert-success" *ngSwitchCase="true">
+        <span *ngIf="account">Vui lòng chọn thôi tin bạn muốn xem!</span>
+      </div>
+      <div *ngSwitchCase="true">
+        <div>
+          <button type="button" (click)="selectType(1)" class="btn btn-primary"> Địa chỉ</button>
+          <button type="button" (click)="selectType(2)" class="btn btn-primary"> Điểm số</button>
+          <button type="button" (click)="selectType(3)" class="btn btn-primary"> Thông tin gia đình</button>
+        </div>
+        <div>
+          <div *ngIf="selection == 1">
+            <div style="padding-top : 20px"
+              *ngIf="address != null"> <b>Huyện {{ address.district }}, thành phố {{ address.city }} </b> </div>
+            <div class="alert alert-warning" *ngIf="address == null">
+              <span> Bạn không có quyền truy cập thông tin này! </span>
+            </div>
+          </div>
+          <div *ngIf="selection == 2">
+            <div *ngIf="subjects!=null">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Tên môn học</th>
+                  <th scope="col">Điểm số</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let subject of subjects; let i = index">
+                  <th scope="row">{{ i }}</th>
+                  <td> {{ subject.name }}</td>
+                  <td> {{ subject.grade }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="alert alert-warning" *ngIf="subjects == null">
+              <span> Bạn không có quyền truy cập thông tin này! </span>
+            </div>
+          </div>
+          <div *ngIf="selection == 3">
+            <div *ngIf="relations!=null">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Tên</th>
+                  <th scope="col">Năm sinh</th>
+                  <th scope="col">Mối quan hệ</th>
+                  <th scope="col">Số điện thoại</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let relation of relations; let i = index">
+                  <th scope="row">{{ i }}</th>
+                  <td> {{ relation.name }}</td>
+                  <td> {{ relation.yearOfBirth }}</td>
+                  <td> {{ relation.relation }}</td>
+                  <td> {{ relation.phoneNumber }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="alert alert-warning" *ngIf="relations == null">
+              <span> Bạn không có quyền truy cập thông tin này! </span>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!--      <div class="alert alert-warning" *ngSwitchCase="false">-->
+      <!--        <span>You don't have an account yet?</span>&nbsp;-->
+      <!--        <a class="alert-link" routerLink="account/register">Register a new account</a>-->
+      <!--      </div>-->
+      <!--    </div>-->
       <div class="alert alert-warning" *ngSwitchCase="false">
-        <span>you are not logged </span>
+        <span>Xin hãy đăng nhập để xem các thông tin của sinh viên!</span>
       </div>
 
-<!--      <div class="alert alert-warning" *ngSwitchCase="false">-->
-<!--        <span>You don't have an account yet?</span>&nbsp;-->
-<!--        <a class="alert-link" routerLink="account/register">Register a new account</a>-->
-<!--      </div>-->
-<!--    </div>-->
-
+    </div>
 
   </div>
 </div>
+
