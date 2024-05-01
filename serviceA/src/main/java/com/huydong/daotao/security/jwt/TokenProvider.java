@@ -170,8 +170,7 @@ public class TokenProvider {
                 TypeReference<List<String>> roles = new TypeReference<List<String>>() {};
                 JSONObject jsonObject = new JSONObject(response.getBody());
                 UserInfo result = new UserInfo();
-                result.setEmail(jsonObject.get("email").toString());
-                result.setName(jsonObject.get("name").toString());
+//                result.setName(jsonObject.get("name").toString());
                 result.setUsername(jsonObject.get("preferred_username").toString());
                 String scope = jsonObject.getString("scope");
                 result.setRoles(Arrays.asList(scope.split(" ")));
